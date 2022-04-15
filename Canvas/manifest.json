@@ -1,0 +1,15 @@
+{
+  "name": "Canvas Extension",
+  "description": "Currently just view class average.",
+  "version": "1.0",
+  "manifest_version": 3,
+  "permissions": ["storage"],
+  "content_scripts": [
+   {
+     "matches": [
+       "https://canvas.biola.edu/courses/*/grades"
+      ],
+     "js": ["index.js"]
+   }
+ ]
+}
