@@ -44,4 +44,13 @@ document.addEventListener("keydown", function (event) {
       console.log(error);
     }
   }
+  // ALT + S saves ticket
+  else if(event.altKey && event.key === "s") {
+    try {
+      document.querySelector("#TicketSaveButtonsContainer > tr > td > table > tbody > tr > td:nth-child(2) > div > a:nth-child(14)").click();
+    } catch (error) {
+      console.log(error);
+    }
+  }
 });
+
