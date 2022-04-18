@@ -6,11 +6,11 @@ document.addEventListener("keydown", function (event) {
   // ALT + N create new tech note
   if (event.altKey && event.key === "n") {
     try {
-      let cancelButton = document.querySelector("#TechNoteEditorUpdateContainer > table > tbody > tr:nth-child(6) > td > div > a:nth-child(1)");
+      let cancelSection = [...document.querySelectorAll("#TechNoteEditorUpdateContainer > table > tbody > tr")].find(({innerText, textContent}) => innerText.match(/Cancel/g));
       // if note is already open
-      if(cancelButton) {
+      if(cancelSection) {
         // close note
-        cancelButton.click();
+        cancelSection.querySelector("td > div > a").click();
       }
       // create new note
       else {
@@ -47,7 +47,20 @@ document.addEventListener("keydown", function (event) {
   // ALT + S saves ticket
   else if(event.altKey && event.key === "s") {
     try {
-      document.querySelector("#TicketSaveButtonsContainer > tr > td > table > tbody > tr > td:nth-child(2) > div > a:nth-child(14)").click();
+      let notClicked = true;
+      // buttons have different locations
+      let saveButtons = [
+        document.querySelector("#TicketSaveButtonsContainer > tr > td > table > tbody > tr > td:nth-child(2) > div > a:nth-child(14)"),
+        document.querySelector("#TicketSaveButtonsContainer > tr > td > table > tbody > tr > td:nth-child(2) > div > a:nth-child(15)"),
+      ];
+      // find the right button to click
+      for(let button of saveButtons) {
+        if(button) {
+          button.click();
+          break;
+        }
+      }
+
     } catch (error) {
       console.log(error);
     }
