@@ -1,6 +1,7 @@
 /*
 Web Help Desk Keyboard Short Cuts
 */
+var index = 3; 
 
 document.addEventListener("keydown", function (event) {
   // ALT + N create new tech note
@@ -65,5 +66,38 @@ document.addEventListener("keydown", function (event) {
       console.log(error);
     }
   }
+  // ALT + Z copies ith elements to clipboard
+  /*
+  else if(event.altKey && event.key === "z") {
+    try {
+      let tabs = ""; 
+      for(let i=1;i<index;i++) tabs += "\t";
+      navigator.clipboard.writeText([...document.querySelector(`#DetailsPanelDiv > table > tbody > tr:nth-child(6) > td > div > select:nth-child(${index})`).options].map(e=>`${tabs}${e.textContent}`).join("\n"))
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  // ALT + <NUMBER> sets index
+  else if(event.altKey && parseInt(event.key)) {
+    try {
+      index = parseInt(event.key)
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  */
+  // CTRL + Enter saves and formats tech note
+  else if(event.ctrlKey && event.key === "Enter") {
+    try {
+      let element = document.activeElement
+      console.log({element});
+      if(element.tagName.toLowerCase() === "textarea") {
+        document.querySelector("#TechNoteEditorUpdateContainer > table > tbody > tr:nth-child(5) > td > div > a:last-child").click();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  
 });
 
