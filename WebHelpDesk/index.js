@@ -98,6 +98,13 @@ document.addEventListener("keydown", function (event) {
       console.log(error);
     }
   }
-  
+  // ALT + Q goes to the "My Tickets" queue
+  else if (event.altKey && event.key === "q") {
+    try {
+      document.querySelector("#subMenuButtons > li.tabDown > a").click();
+    } catch (error) {
+      console.log(error);
+    }
+  }
 });
 
