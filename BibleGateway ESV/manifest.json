@@ -1,0 +1,14 @@
+{
+    "name": "BibleGateway ESV",
+    "description": "Always load BibleGateway links in ESV",
+    "version": "1.0",
+    "manifest_version": 3,
+    "permissions": ["storage"],
+    "content_scripts": [
+      {
+        "matches": ["https://www.biblegateway.com/passage/*"],
+        "js": ["index.js"]
+      }
+    ]
+  }
+  
