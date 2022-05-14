@@ -1,15 +1,15 @@
 {
-  "name": "Origin",
-  "description": "Get Origin IDs",
+  "name": "Web Help Desk Keybinds",
+  "description": "Keyboard Shortcuts for Web Help Desk",
   "version": "1.0",
   "manifest_version": 3,
   "permissions": ["storage"],
   "content_scripts": [
-   {
-     "matches": [
-       "https://www.origin.com/*"
+    {
+      "matches": [
+        "https://whd.biola.edu/helpdesk/WebObjects/Helpdesk.woa/wa/TicketActions/*"
       ],
-     "js": ["script.js"]
-   }
- ]
+      "js": ["index.js"]
+    }
+  ]
 }
