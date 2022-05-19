@@ -3,9 +3,11 @@ Web Help Desk Keyboard Short Cuts
 RegEx to match keybinds: /(?<=\/\/ )(ALT|ENTER)[^\n]+/gim
 */
 
+var message = "";
+var clientType = {};
 var index = 3;
 
-document.addEventListener("keydown", function (event) {
+document.addEventListener("keydown", async function (event) {
   // ALT + N open new tech note or a new ticket if on ticket queue page
   if (event.altKey && event.key === "n") {
     try {
@@ -183,11 +185,84 @@ document.addEventListener("keydown", function (event) {
   // ALT + R expands request type select menu
   else if (event.altKey && event.key === "r") {
     try {
-      ExpandSelect(
-        [...document.getElementById("ticketRequestTypeObserverDiv").childNodes]
-          .filter((t) => t.tagName === "SELECT")
-          .at(-1)
-      );
+      let selects = [
+        ...document.getElementById("ticketRequestTypeObserverDiv").childNodes,
+      ].filter((t) => t.tagName === "SELECT");
+      if (selects.at(-1).value === "WONoSelectionString") {
+        selects.at(-1).focus();
+      } else {
+        selects[0].focus();
+      }
+      // document.dispatchEvent(new KeyboardEvent("keydown", { key: "Space" }));
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  // TAB goes to next request subtype
+  else if (event.shiftKey === false && event.key === "Tab") {
+    // } else if (event.key === "Tab") {
+    try {
+      // dirty method
+      /*
+      get select element count
+      */
+      let selects = [
+        ...document.getElementById("ticketRequestTypeObserverDiv").childNodes,
+      ].filter((t) => t.tagName === "SELECT");
+      // length > 1 means I have started filling out request detail
+      if (
+        selects.at(-1).value === "WONoSelectionString" &&
+        selects.length > 1
+      ) {
+        // for (let i = 0; i < 4 + selects.length; i++) {
+        //   document.dispatchEvent(new KeyboardEvent("keydown", { key: "TAB" }));
+        // }
+        selects.at(-1).focus();
+        event.preventDefault();
+        // if (event.shiftKey === false) event.preventDefault();
+        // document.dispatchEvent(new KeyboardEvent("keydown", { key: "Space" }));
+        // new KeyboardEvent("keydown", { keyCode: 32, which: 32 });
+      }
+      // deprecated
+      // ExpandSelect(
+      //   [...document.getElementById("ticketRequestTypeObserverDiv").childNodes]
+      //     .filter((t) => t.tagName === "SELECT")
+      //     .at(-1)
+      // );
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  // ALT + F fills out client info from copied email
+  else if (event.altKey && event.key === "f") {
+    try {
+      event.preventDefault();
+      let text = await navigator.clipboard.readText();
+      text = text.replace(/\r/gim, "");
+      let firstName = text.match(/(?<=^From: )\S+/gim)?.[0];
+      let lastName = text.match(/(?<=^From: \S+ )\S+/gim)?.[0];
+      let email = text.match(/(?<=^From:[^\<]+\<)[^\>]+/gim)?.[0];
+      let isBiolaEmail = email?.match(/biola\.edu/gim);
+      if (isBiolaEmail) {
+        document.querySelector("input[name='emailField']").value = email;
+      } else {
+        if (firstName === "OnceHub" && lastName === "Mailer") {
+          firstName = text.match(/(?<=^Customer name\n)\S+/gm)[0];
+          lastName = text.match(/(?<=^Customer name\n\S+ )\S+/gm)[0];
+        }
+        // idk why no name field :(
+        document.querySelector(
+          "#ClientPartUpdateContainerDiv > div:nth-child(1) > div > form > div.ticketSection > table > tbody > tr:nth-child(1) > td:nth-child(2) > input[type=text]"
+        ).value = firstName;
+        document.querySelector("input[name='lastNameField']").value = lastName;
+      }
+      // message = "ticketTab";
+      // click search button
+      document
+        .querySelector(
+          "#ClientPartUpdateContainerDiv > div:nth-child(1) > div > form > div.ticketSection > table > tbody > tr:nth-child(7) > td > div.buttonsRight > div:nth-child(2) > a:nth-child(3)"
+        )
+        .click();
     } catch (error) {
       console.log(error);
     }
@@ -230,4 +305,54 @@ document.addEventListener("paste", async (event) => {
     element.value = text;
     event.preventDefault();
   }
+});
+
+window.addEventListener("load", function () {
+  // scrape client type
+  try {
+    clientType = {
+      affiliationType: [
+        ...document.querySelectorAll("div.ticketSection > table > tbody > tr"),
+      ]
+        .find((f) => f.innerText.includes("Primary Affiliation"))
+        .innerText.match(/(?<=\n)[^\t]+/gim)[0],
+      employeeType: [
+        ...document.querySelectorAll("div.ticketSection > table > tbody > tr"),
+      ]
+        .find((f) => f.innerText.includes("Employee Type"))
+        .innerText.match(/(?<=\n)[^\t]+/gim)[0],
+    };
+  } catch {}
+  // console.log(clientType);
+  // auto focuses request detail when blank
+  let requestDetail = this.document.getElementById("requestDetail");
+  if (requestDetail) {
+    if (requestDetail?.value?.length === 0) {
+      requestDetail.focus();
+      return;
+    }
+  }
+  // currently does nothing
+  // but exists to chain events that require loading in between
+  switch (message) {
+    case "ticketTab":
+      document.dispatchEvent(
+        new KeyboardEvent("keydown", { key: "t", altKey: true })
+      );
+      break;
+    default:
+    // code block
+  }
+
+  // // auto focuses next request type select menu
+  // let selects = [
+  //   ...document.getElementById("ticketRequestTypeObserverDiv").childNodes,
+  // ].filter((t) => t.tagName === "SELECT");
+  // if (selects.at(-1).value === "WONoSelectionString") {
+  //   selects.at(-1).focus();
+  // }
+
+  // i forgot what this was for
+  // it is maybe for client type
+  message = "";
 });
