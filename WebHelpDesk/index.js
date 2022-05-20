@@ -243,6 +243,12 @@ document.addEventListener("keydown", async function (event) {
       let lastName = text.match(/(?<=^From: \S+ )\S+/gim)?.[0];
       let email = text.match(/(?<=^From:[^\<]+\<)[^\>]+/gim)?.[0];
       let isBiolaEmail = email?.match(/biola\.edu/gim);
+      // formstack
+      if (email === "no-reply@biola.edu") {
+        firstName = text.match(/(?<=^Name:\s+)\S+/gim)?.[0];
+        lastName = text.match(/(?<=^Name:\s+\S+ )\S+/gim)?.[0];
+        email = text.match(/(?<=^Email:\s+)\S+/gim)?.[0];
+      }
       if (isBiolaEmail) {
         document.querySelector("input[name='emailField']").value = email;
       } else {
@@ -274,19 +280,57 @@ document.addEventListener("paste", async (event) => {
   let element = event.target;
   let text = await navigator.clipboard.readText();
   text = text.replace(/\r/gim, "");
-  text = text.replace(/^\n+---------- Forwarded message ---------\n/g, "");
+  text = text.replace(/^\n*---------- Forwarded message ---------\n/g, "");
   let isEmail = text.match(/^From:/g);
   if (isEmail) {
-    let isFormstack = text.match(
-      /^From: OnceHub Mailer \<mailer@oncehub.com\>/g
+    let isForm = text.match(
+      /^(From: OnceHub Mailer \<mailer@oncehub.com\>|From: \<no-reply@biola\.edu\>)/g
     );
     // is formstack form
-    if (isFormstack) {
+    if (isForm) {
+      let fieldOnNextLine = [
+        "To: <it.helpdesk@biola.edu>\n\n\n ",
+        "Booking page image",
+        "Subject",
+        "Technical Support Appointment",
+        "Calendar",
+        "Your time",
+        "Customer time",
+        "Location",
+        "Booking ID",
+        "Customer name",
+        "Phone number",
+        "Customer's mobile phone",
+        "Type of Assistance",
+        "What type of computer is being updated?",
+        "Best number to reach you",
+        "Asset Number",
+        "Computer OS Update Time Slot",
+        "Ticket Number",
+      ];
+      let fieldOnSameLine = [
+        "Passcode",
+        "Meeting ID",
+        "Meeting passcode",
+        "Formstack Submission For",
+        "Name",
+        "Asset Number",
+        "What kind of issue are you having?",
+        "Describe the problem (or error message)",
+      ];
+      // maybe i can move the ^ left 1, cause i dont think it makes starting on a new line required for same-line fields
+      let fieldMatcher = new RegExp(
+        `(?<=(^(${fieldOnNextLine.join("|")})\\n)|((${fieldOnSameLine.join(
+          "|"
+        )}):(\\t| )+)).*`,
+        "gim"
+      );
       // bolds next line after the following headers
       // first group is `text + newline` (for field being on next line)
       // second group is `text:` (for field being on same line)
       text = text.replace(
-        /(?<=((To: <it.helpdesk@biola.edu>\n\n\n |Booking page image|Subject|Technical Support Appointment|Calendar|Your time|Customer time|Location|Booking ID|Customer name|Phone number|Customer's mobile phone|Type of Assistance|What type of computer is being updated\?|Best number to reach you|Asset Number|Computer OS Update Time Slot|Ticket Number)\n)|((Passcode:|Meeting ID:|Meeting passcode:) ?)).*/gm,
+        fieldMatcher,
+        // /(?<=(^(To: <it.helpdesk@biola.edu>\n\n\n |Booking page image|Subject|Technical Support Appointment|Calendar|Your time|Customer time|Location|Booking ID|Customer name|Phone number|Customer's mobile phone|Type of Assistance|What type of computer is being updated\?|Best number to reach you|Asset Number|Computer OS Update Time Slot|Ticket Number)\n)|((Passcode|Meeting ID|Meeting passcode|Formstack Submission For|Name|Asset Number|What kind of issue are you having\?|Describe the problem \(or error message\)):(\t| )+)).*/gim,
         (m) => `[b]${m}[/b]`
       );
     }
