@@ -3,6 +3,10 @@ Web Help Desk Keyboard Short Cuts
 RegEx to match keybinds: /(?<=\/\/ )(ALT|ENTER)[^\n]+/gim
 */
 
+function bold(str) {
+  return `[b]${str}[/b]`;
+}
+
 var message = "";
 var clientType = {};
 var index = 3;
@@ -59,6 +63,8 @@ document.addEventListener("keydown", async function (event) {
           /(?<=[^\]])a\d{6}/gim,
           (m) => `[b]${m.toUpperCase()}[/b]`
         );
+        element.value = element.value.replace(/\n\s+\n/gim, "\n\n");
+
         // bolds urls but unnecessary
         // element.value = element.value.replace(
         //   /(?<=[^\]][^ ])https?:\/\/\S+/gim,
@@ -71,11 +77,11 @@ document.addEventListener("keydown", async function (event) {
         // if (element.value.match(/(?<=^Subject:).*/gim))
         //   element.value = element.value.replace(
         //     /(?<=^Subject:).*/gim,
-        //     (m) => `[b]${m}[/b]`
+        //     bold
         //   );
 
         // mark visible to client if email
-        if (element.value.match(/^(\[quote\])?From:/g)) {
+        if (element.value.match(/^(\[quote\])?\n*From:/g)) {
           document.querySelector(
             "#TechNoteEditorUpdateContainer > table > tbody > tr:nth-child(1) > td.dataTop > table > tbody > tr:nth-child(2) > td:nth-child(1) > table > tbody > tr > td:nth-child(1) > input[type=checkbox]"
           ).checked = true;
@@ -172,9 +178,15 @@ document.addEventListener("keydown", async function (event) {
     try {
       let ticketNumber;
       while (!ticketNumber) {
-        ticketNumber = prompt("Enter a ticket number:").match(
-          /(?<=T?(icket ?)?)\d{6}/gim
-        );
+        let input = prompt("Enter a ticket number:");
+        // console.log(input);
+        ticketNumber = input.match(/(?<=Ticket )\d{6}/gim);
+        if (!ticketNumber)
+          ticketNumber = input.match(
+            /(?<=^Ticket Number\nT?(icket ?)?)\d{6}/gim
+          );
+        if (!ticketNumber)
+          ticketNumber = input.match(/(?<=^T?(icket ?)?)\d{6}/gim);
       }
       ticketNumber = ticketNumber[0];
       window.location = `https://whd.biola.edu/helpdesk/WebObjects/Helpdesk.woa/wa/TicketActions/view?ticket=${ticketNumber}`;
@@ -280,14 +292,35 @@ document.addEventListener("paste", async (event) => {
   let element = event.target;
   let text = await navigator.clipboard.readText();
   text = text.replace(/\r/gim, "");
-  text = text.replace(/^\n*---------- Forwarded message ---------\n/g, "");
-  let isEmail = text.match(/^From:/g);
+  // text = text.replace(/^\n*---------- Forwarded message ---------\n/g, "");
+
+  // removes ticket thread
+  text = text.replace(
+    /On .* Biola IT Helpdesk <it.helpdesk@biola.edu> wrote:[^]+/gim,
+    ""
+  );
+
+  let quoteCount =
+    text.match(/---------- Forwarded message ---------/gim)?.length || 0;
+  // FINISH THIS
+  quoteCount += text.match(/On .* at .* \<.*\> wrote:/gim)?.length || 0;
+  text = text.replace(/On .* at .* \<.*\> wrote:/gim, (m) => `[quote]${m}`);
+  // console.log({ text });
+  text = text.replace(
+    /\n*---------- Forwarded message ---------\n+/gim,
+    "[quote]\n"
+  );
+  // console.log({ text });
+  text = text.replace(/(?<=^Subject: .*\[\/?quote)\]/gim, "​]");
+
+  let isEmail = text.match(/^(\[quote\]\n)?From:/g);
   if (isEmail) {
     let isForm = text.match(
-      /^(From: OnceHub Mailer \<mailer@oncehub.com\>|From: \<no-reply@biola\.edu\>)/g
+      /^(\[quote\]\n)?(From: OnceHub Mailer \<mailer@oncehub.com\>|From: \<no-reply@biola\.edu\>|From: Alumni Relations <alumni.relations@biola.edu>)/g
     );
     // is formstack form
     if (isForm) {
+      // console.log({ isForm });
       let fieldOnNextLine = [
         "To: <it.helpdesk@biola.edu>\n\n\n ",
         "Booking page image",
@@ -315,8 +348,38 @@ document.addEventListener("paste", async (event) => {
         "Formstack Submission For",
         "Name",
         "Asset Number",
-        "What kind of issue are you having?",
-        "Describe the problem (or error message)",
+        "What kind of issue are you having\\?",
+        "Describe the problem \\(or error message\\)",
+        "Your Name",
+        "Personal Email Address",
+        "Biola Email Address",
+        "Phone",
+        "Preferred Contact Method",
+        "How can we help with your Biola Alumni Google account\\?",
+        "What difficulty are you having accessing your account\\?",
+        "What method are you using to transfer data out of your account?",
+        "Please describe:",
+        "Please describe your difficulty",
+        "Current Legal Name",
+        "Is your current legal name different from your name while attending Biola\\?",
+        "Name while attending Biola",
+        "Current Mailing Address",
+        "Birthday",
+        "Year you graduated or left Biola",
+        "Major at Biola",
+        "Biola ID Number",
+        "Email",
+        "Will this address be used by a department, or by a student group\\?",
+        "Preferred Email Address",
+        "What department will this account belong to\\?",
+        "Who will manage this account\\?",
+        "What is the primary use for this account\\?",
+        "Preferred Email Address",
+        "Preferred Sender Name",
+        "What department will this account belong to\\?",
+        "Who is the faculty or staff advisor for this student group\\?",
+        "What is the primary use for this account\\?",
+        "Do you agree to the terms and conditions\\?",
       ];
       // maybe i can move the ^ left 1, cause i dont think it makes starting on a new line required for same-line fields
       let fieldMatcher = new RegExp(
@@ -325,27 +388,42 @@ document.addEventListener("paste", async (event) => {
         )}):(\\t| )+)).*`,
         "gim"
       );
+      // console.log(fieldMatcher);
       // bolds next line after the following headers
       // first group is `text + newline` (for field being on next line)
       // second group is `text:` (for field being on same line)
       text = text.replace(
         fieldMatcher,
         // /(?<=(^(To: <it.helpdesk@biola.edu>\n\n\n |Booking page image|Subject|Technical Support Appointment|Calendar|Your time|Customer time|Location|Booking ID|Customer name|Phone number|Customer's mobile phone|Type of Assistance|What type of computer is being updated\?|Best number to reach you|Asset Number|Computer OS Update Time Slot|Ticket Number)\n)|((Passcode|Meeting ID|Meeting passcode|Formstack Submission For|Name|Asset Number|What kind of issue are you having\?|Describe the problem \(or error message\)):(\t| )+)).*/gim,
-        (m) => `[b]${m}[/b]`
+        bold
       );
     }
     // bold sender
-    text = text.replace(/(?<=^From: )[^\<]+/gim, (m) => `[b]${m}[/b]`);
+    text = text.replace(/(?<=^From: )[^\<]+/gim, bold);
+    text = text.replace(/(?<=^To: )[^\<]+/gim, bold);
     // bold subject line
-    text = text.replace(/(?<=^Subject: ).*/gim, (m) => `[b]${m}[/b]`);
-    // removes ticket thread
-    text = text.replace(
-      /On .* Biola IT Helpdesk <it.helpdesk@biola.edu> wrote:[^]+/gim,
-      ""
+    text = text.replace(/(?<=^Subject: ).*/gim, bold);
+    // bold asset
+    element.value = element.value.replace(
+      /(?<=[^\]])a\d{6}/gim,
+      (m) => `[b]${m.toUpperCase()}[/b]`
     );
+    // bold id# from alumni verification
+    text = text.replace(/(?<=^ID# )\d+/gim, bold);
+
+    // // removes ticket thread
+    // text = text.replace(
+    //   /On .* Biola IT Helpdesk <it.helpdesk@biola.edu> wrote:[^]+/gim,
+    //   ""
+    // );
 
     // quotes email
-    text = `[quote]${text}[/quote]`;
+    // text = `[quote]${text}[/quote]`;
+    for (let i = 0; i < quoteCount; i++) {
+      text += "[/quote]";
+    }
+    text = text.replace(/\n\s+\n/gim, "\n\n");
+    text = text.replace(/\s+\[\/quote\]/gim, "[/quote]");
     element.value = text;
     event.preventDefault();
   }
