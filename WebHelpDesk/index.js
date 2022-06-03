@@ -143,23 +143,8 @@ document.addEventListener("keydown", async function (event) {
   // ALT + S saves ticket (when on ticket tab)
   else if (event.altKey && event.key === "s") {
     try {
-      let notClicked = true;
-      // buttons have different locations
-      let saveButtons = [
-        document.querySelector(
-          "#TicketSaveButtonsContainer > tr > td > table > tbody > tr > td:nth-child(2) > div > a:nth-child(14)"
-        ),
-        document.querySelector(
-          "#TicketSaveButtonsContainer > tr > td > table > tbody > tr > td:nth-child(2) > div > a:nth-child(15)"
-        ),
-      ];
-      // find the right button to click
-      for (let button of saveButtons) {
-        if (button) {
-          button.click();
-          break;
-        }
-      }
+      // i think this should work
+      document.querySelector(".aquaMiddleSel").click();
     } catch (error) {
       console.log(error);
     }
@@ -252,7 +237,8 @@ document.addEventListener("keydown", async function (event) {
       let text = await navigator.clipboard.readText();
       text = text.replace(/\r/gim, "");
       let firstName = text.match(/(?<=^From: )\S+/gim)?.[0];
-      let lastName = text.match(/(?<=^From: \S+ )\S+/gim)?.[0];
+      // let lastName = text.match(/(?<=^From: \S+ )\S+/gim)?.[0];
+      let lastName = text.match(/(?<=^From: [^<]+ )[^<]+(?=<)/gim)?.[0];
       let email = text.match(/(?<=^From:[^\<]+\<)[^\>]+/gim)?.[0];
       let isBiolaEmail = email?.match(/biola\.edu/gim);
       // formstack
@@ -279,6 +265,19 @@ document.addEventListener("keydown", async function (event) {
       document
         .querySelector(
           "#ClientPartUpdateContainerDiv > div:nth-child(1) > div > form > div.ticketSection > table > tbody > tr:nth-child(7) > td > div.buttonsRight > div:nth-child(2) > a:nth-child(3)"
+        )
+        .click();
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  // ALT + E edits a message
+  else if (event.altKey && event.key === "e") {
+    try {
+      event.preventDefault();
+      document
+        .querySelector(
+          "#NoteListUpdateDiv > table > tbody > tr:nth-child(2) > td > a"
         )
         .click();
     } catch (error) {
@@ -315,8 +314,9 @@ document.addEventListener("paste", async (event) => {
 
   let isEmail = text.match(/^(\[quote\]\n)?From:/g);
   if (isEmail) {
+    // just made it multiline
     let isForm = text.match(
-      /^(\[quote\]\n)?(From: OnceHub Mailer \<mailer@oncehub.com\>|From: \<no-reply@biola\.edu\>|From: Alumni Relations <alumni.relations@biola.edu>)/g
+      /^(\[quote\]\n)?(From: OnceHub Mailer \<mailer@oncehub.com\>|From: \<no-reply@biola\.edu\>|From: Alumni Relations <alumni.relations@biola.edu>)/gm
     );
     // is formstack form
     if (isForm) {
@@ -341,7 +341,7 @@ document.addEventListener("paste", async (event) => {
         "Computer OS Update Time Slot",
         "Ticket Number",
       ];
-      let fieldOnSameLine = [
+      let fieldOnSameLineWithColon = [
         "Passcode",
         "Meeting ID",
         "Meeting passcode",
@@ -357,7 +357,7 @@ document.addEventListener("paste", async (event) => {
         "Preferred Contact Method",
         "How can we help with your Biola Alumni Google account\\?",
         "What difficulty are you having accessing your account\\?",
-        "What method are you using to transfer data out of your account?",
+        "What method are you using to transfer data out of your account\\?",
         "Please describe:",
         "Please describe your difficulty",
         "Current Legal Name",
@@ -380,13 +380,49 @@ document.addEventListener("paste", async (event) => {
         "Who is the faculty or staff advisor for this student group\\?",
         "What is the primary use for this account\\?",
         "Do you agree to the terms and conditions\\?",
+        "Formstack Submission For",
+        "Employee's Name",
+        "Biola ID Number \\(if known\\)",
+        "Effective Starting Date",
+        "Banner Fund Number",
+        "Banner Organization Number",
+        "Department Name",
+        "Position Title",
+        'Who is this person replacing\\? If this is a new position, write "NEW".',
+        "Supervisor Name",
+        "Supervisor's Biola ID",
+        "Will this person drive Biola vehicles\\?",
+        "For HR Use Only",
+        "Is this a Regular or Temporary position\\?",
+        "Temporary until what date\\?",
+        "The standard hours worked per week are:",
+        "The number of months worked per year are:",
+        "Is this a salaried or hourly position\\?",
+        "Starting Hourly Pay:",
+        "Submitter's Name",
+        "Submitter's Email Address",
+        "Email Address of Area Vice President \\(needed for authorization\\)",
+        "For Office Use Only",
+        "Form Name",
+        "Submission Time",
+        "Unique ID",
+        "Please check here if you would like Biola to update your personal email address in our database:",
+      ];
+      let fieldOnSameLineWithoutColon = [
+        "Submitted at",
+        "Name",
+        "Semester subscription cost",
+        "Banner Fund",
+        "Banner Org",
       ];
       // maybe i can move the ^ left 1, cause i dont think it makes starting on a new line required for same-line fields
       let fieldMatcher = new RegExp(
-        `(?<=(^(${fieldOnNextLine.join("|")})\\n)|((${fieldOnSameLine.join(
+        `(?<=(^(${fieldOnNextLine.join(
           "|"
-        )}):(\\t| )+)).*`,
-        "gim"
+        )})\\n)|((${fieldOnSameLineWithColon.join(
+          "|"
+        )}):(\\t| )+)|((${fieldOnSameLineWithoutColon.join("|")})(\\t| )+)).*`,
+        "gm"
       );
       // console.log(fieldMatcher);
       // bolds next line after the following headers
