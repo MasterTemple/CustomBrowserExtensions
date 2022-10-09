@@ -2,6 +2,12 @@
 Created by Fluffy_User_0x06
 I know there are better ways to toggle, but this works so it's fine :)
 */
+window.addEventListener("load", () => {
+  alert("load");
+});
+window.addEventListener("loadeddata", () => {
+  alert("loadeddata");
+});
 
 document.addEventListener("keydown", function (event) {
   // ALT + T toggles hiding/showing Origin IDs
