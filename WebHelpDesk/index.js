@@ -300,12 +300,21 @@ function setTabLocation() {
 }
 
 async function fillClientTab() {
+  // clear fields
+  document.querySelector("input[name='emailField']").value = "";
+  document.querySelector(
+    "#ClientPartUpdateContainerDiv > div:nth-child(1) > div > form > div.ticketSection > table > tbody > tr:nth-child(1) > td:nth-child(2) > input[type=text]"
+  ).value = "";
+  document.querySelector("input[name='lastNameField']").value = "";
+
+  // read clipboard
   let text = (await navigator.clipboard.readText()).replace(/\r/gim, "");
 
   let firstName = text.match(/(?<=^From: )\S+/gim)?.[0];
   let lastName = text.match(/(?<=^From: \S+ )\S+/gim)?.[0];
   // let lastName = text.match(/(?<=^From: [^<]+ )[^<]+(?=<)/gim)?.[0];
   let email = text.match(/(?<=^From:[^\<]+\<)[^\>]+/gim)?.[0];
+  if (!email) email = text.match(/[A-z\.\-\_0-9]+\@biola\.edu/gim)?.[0];
   let isBiolaEmail = email?.match(/biola\.edu/gim);
   // formstack
   if (email === "no-reply@biola.edu") {
@@ -315,25 +324,30 @@ async function fillClientTab() {
   }
 
   if (isBiolaEmail) {
-    document.querySelector("input[name='emailField']").value = email;
+    document.querySelector("input[name='emailField']").value = email || "";
   } else {
     if (firstName === "OnceHub" && lastName === "Mailer") {
       firstName = text.match(/(?<=^Customer name\n)\S+/gm)[0];
-      lastName = text.match(/(?<=^Customer name\n\S+ )\S+/gm)[0];
+      lastName = text.match(/(?<=^Customer name\n(\S+ )+)\S+$/gm)[0];
     }
     // idk why no name field :(
     document.querySelector(
       "#ClientPartUpdateContainerDiv > div:nth-child(1) > div > form > div.ticketSection > table > tbody > tr:nth-child(1) > td:nth-child(2) > input[type=text]"
-    ).value = firstName;
-    document.querySelector("input[name='lastNameField']").value = lastName;
+    ).value = firstName || "";
+    document.querySelector("input[name='lastNameField']").value =
+      lastName || "";
   }
-  // message = "ticketTab";
+
   // click search button
-  document
-    .querySelector(
-      "#ClientPartUpdateContainerDiv > div:nth-child(1) > div > form > div.ticketSection > table > tbody > tr:nth-child(7) > td > div.buttonsRight > div:nth-child(2) > a:nth-child(3)"
-    )
-    .click();
+  if (!firstName && !lastName && !email) {
+    alert("No client data found in clipboard!");
+  } else {
+    document
+      .querySelector(
+        "#ClientPartUpdateContainerDiv > div:nth-child(1) > div > form > div.ticketSection > table > tbody > tr:nth-child(7) > td > div.buttonsRight > div:nth-child(2) > a:nth-child(3)"
+      )
+      .click();
+  }
 }
 async function fillAssetTab() {
   let text = (await navigator.clipboard.readText()).replace(/\r/gim, "");
