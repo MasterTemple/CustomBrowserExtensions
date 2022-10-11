@@ -335,8 +335,14 @@ function setTabLocation() {
 
 function defaultMessage() {
   let note = document.getElementById("noteText");
-  if (note.value === "!")
+  if (note.value === "!") {
+    // insert default message
     note.value = "Hello\n\nThank you for contacting Biola's IT Helpdesk.\n\n";
+    // mark visible
+    document.querySelector(
+      "#TechNoteEditorUpdateContainer > table > tbody > tr:nth-child(1) > td.dataTop > table > tbody > tr:nth-child(2) > td:nth-child(1) > table > tbody > tr > td:nth-child(1) > input[type=checkbox]"
+    ).checked = true;
+  }
 }
 
 async function fillClientTab() {
