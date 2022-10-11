@@ -527,6 +527,7 @@ document.addEventListener("keydown", async function (event) {
   // ENTER (!)
   else if (!event.ctrlKey && event.key === "Enter") {
     defaultMessage();
+    preventDefault = false;
   }
   // CTRL + ENTER saves a tech note and formats it (bolds assets and marks tech note as visible if it is an email)
   else if (event.ctrlKey && event.key === "Enter") {
@@ -776,5 +777,15 @@ document.addEventListener("paste", async (event) => {
     text = text.replace(/\s+\[\/quote\]/gim, "[/quote]");
     element.value = text;
     event.preventDefault();
+  }
+});
+
+window.addEventListener("load", function () {
+  let requestDetail = this.document.getElementById("requestDetail");
+  if (requestDetail) {
+    if (requestDetail?.value?.length === 0) {
+      requestDetail.focus();
+      return;
+    }
   }
 });
