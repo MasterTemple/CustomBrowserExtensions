@@ -1,9 +1,9 @@
 /*
-Web Help Desk Keyboard Short Cuts
-RegEx to match keybinds: /(?<=\/\/ )(ALT|ENTER|CTRL|Left|Right)[^\n]+/gim
-Log Keypress:
-  document.addEventListener("keydown", e => console.log(e.key))
-*/
+  Web Help Desk Keyboard Short Cuts
+  RegEx to match keybinds: /(?<=\/\/ )(ALT|ENTER|CTRL|Left|Right)[^\n]+/gim
+  Log Keypress:
+    document.addEventListener("keydown", e => console.log(e.key))
+  */
 
 function bool(anything) {
   return !!anything;
@@ -254,13 +254,15 @@ function pageRight() {
     .click();
 }
 
-function setTabLocation() {
+function setTabLocationOld() {
+  // these will be the elements to select in order; first one that is empty
+  let elements = [];
   // } else if (event.key === "Tab") {
 
   // dirty method
   /*
-      get select element count
-      */
+        get select element count
+        */
   let selects = [
     ...document.getElementById("ticketRequestTypeObserverDiv").childNodes,
   ].filter((t) => t.tagName === "SELECT");
@@ -281,6 +283,69 @@ function setTabLocation() {
   //     .filter((t) => t.tagName === "SELECT")
   //     .at(-1)
   // );
+}
+
+function setTabLocation() {
+  // move onto next one if it is a worthless tab
+  let activeElement = document.activeElement;
+  let skips = [
+    // request detail to client info
+    {
+      bad: document.querySelector("#requestDetail"),
+      next: document.querySelector(
+        "#CustomFieldsPanelDiv > table > tbody > tr:nth-child(1) > td.dataStandard > table > tbody > tr > td:nth-child(1) > div > nobr:nth-child(1) > input[type=radio]"
+      ),
+    },
+
+  ];
+
+  let skip = skips.find(({ bad }) => {
+    return bad == activeElement;
+  });
+  console.log({
+    activeElement,
+    skip,
+  });
+  if (skip) {
+    skip.next.focus();
+    return false;
+  }
+
+  // these will be the elements to select in order; first one that is empty
+  let selects = [
+    ...document.getElementById("ticketRequestTypeObserverDiv").childNodes,
+  ]
+    .filter((t) => t.tagName === "SELECT")
+    .map((element) => {
+      return {
+        element: element,
+        value: element.value,
+        emptyValue: "WONoSelectionString",
+      };
+    });
+  let subject = {
+    element: document.getElementById("subject"),
+    value: document.getElementById("subject").value,
+    emptyValue: "",
+  };
+  let requestDetail = {
+    element: document.getElementById("requestDetail"),
+    value: document.getElementById("requestDetail").value,
+    emptyValue: "",
+  };
+
+  let elements = [...selects, subject, requestDetail];
+  let element = elements.find(
+    ({ element, emptyValue, value }) => value == emptyValue
+  );
+  // if (element) element.element.focus();
+  // there is an error if element not found but it is good cause then it doesnt prevent default
+  if (element) {
+    element.element.focus();
+    return false;
+  }
+
+  return true;
 }
 
 async function fillClientTab() {
@@ -482,7 +547,8 @@ document.addEventListener("keydown", async function (event) {
   }
   // TAB goes to next request subtype
   else if (event.shiftKey === false && event.key === "Tab") {
-    setTabLocation();
+    let keepDefault = setTabLocation();
+    if (keepDefault) preventDefault = false;
   }
   // ALT + F fills out client info from copied email
   else if (event.altKey && event.key === "f") {
@@ -501,10 +567,12 @@ document.addEventListener("keydown", async function (event) {
   // Left Arrow Key or J goes left one page (Ex: go through a client's tickets on the client page)
   else if (event.key === "ArrowLeft" || event.key === "j") {
     pageLeft();
+    preventDefault = false;
   }
   // Right Arrow Key or K goes right one page (Ex: go through a client's tickets on the client page)
   else if (event.key === "ArrowRight" || event.key === "k") {
     pageRight();
+    preventDefault = false;
   } else {
     preventDefault = false;
   }
@@ -694,6 +762,7 @@ document.addEventListener("paste", async (event) => {
   }
 });
 
+/*
 window.addEventListener("load", function () {
   // scrape client type
 
@@ -743,3 +812,4 @@ window.addEventListener("load", function () {
   // it is maybe for client type
   msg = "";
 });
+*/

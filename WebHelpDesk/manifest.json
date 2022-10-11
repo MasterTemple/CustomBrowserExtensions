@@ -9,7 +9,8 @@
       "matches": [
         "https://whd.biola.edu/helpdesk/WebObjects/Helpdesk.woa/wa/TicketActions/*"
       ],
-      "js": ["index.js"]
+      "js": ["index.js"],
+      "css": ["style.css"]
     }
   ]
 }
