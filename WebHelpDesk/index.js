@@ -525,7 +525,7 @@ document.addEventListener("keydown", async function (event) {
     }
   }
   // ENTER (!)
-  else if (event.key === "Enter") {
+  else if (!event.ctrlKey && event.key === "Enter") {
     defaultMessage();
   }
   // CTRL + ENTER saves a tech note and formats it (bolds assets and marks tech note as visible if it is an email)
