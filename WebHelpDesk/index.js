@@ -271,7 +271,35 @@ function pageRight() {
   }
 }
 
-function setTabLocation() {
+function clientTabOrder() {
+  let activeElement = document.activeElement;
+  let elements = [];
+  let element = elements.find(
+    ({ element, emptyValue, value }) => value == emptyValue
+  );
+  // there is an error if element not found but it is good cause then it doesnt prevent default
+  if (element) {
+    element.element.focus();
+    return false;
+  }
+  return true;
+}
+
+function assetTabOrder() {
+  let activeElement = document.activeElement;
+  let elements = [];
+  let element = elements.find(
+    ({ element, emptyValue, value }) => value == emptyValue
+  );
+  // there is an error if element not found but it is good cause then it doesnt prevent default
+  if (element) {
+    element.element.focus();
+    return false;
+  }
+  return true;
+}
+
+function ticketTabOrder() {
   // move onto next one if it is a worthless tab
   let activeElement = document.activeElement;
   let skips = [
@@ -286,10 +314,6 @@ function setTabLocation() {
 
   let skip = skips.find(({ bad }) => {
     return bad == activeElement;
-  });
-  console.log({
-    activeElement,
-    skip,
   });
   if (skip) {
     skip.next.focus();
@@ -323,7 +347,6 @@ function setTabLocation() {
   let element = elements.find(
     ({ element, emptyValue, value }) => value == emptyValue
   );
-  // if (element) element.element.focus();
   // there is an error if element not found but it is good cause then it doesnt prevent default
   if (element) {
     element.element.focus();
@@ -566,7 +589,10 @@ document.addEventListener("keydown", async function (event) {
   }
   // TAB goes to next request subtype
   else if (event.shiftKey === false && event.key === "Tab") {
-    let keepDefault = setTabLocation();
+    let keepDefault = false;
+    if (isClientTab()) keepDefault = clientTabOrder();
+    if (isAssetTab()) keepDefault = assetTabOrder();
+    if (isTicketTab()) keepDefault = ticketTabOrder();
     if (keepDefault) preventDefault = false;
   }
   // ALT + F fills out client info from copied email
