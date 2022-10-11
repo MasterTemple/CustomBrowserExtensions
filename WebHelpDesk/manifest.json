@@ -6,9 +6,7 @@
   "permissions": ["storage"],
   "content_scripts": [
     {
-      "matches": [
-        "https://whd.biola.edu/helpdesk/WebObjects/Helpdesk.woa/wa/TicketActions/*"
-      ],
+      "matches": ["https://whd.biola.edu/*"],
       "js": ["index.js"],
       "css": ["style.css"]
     }

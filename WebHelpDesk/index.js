@@ -228,30 +228,59 @@ function editTechNote() {
 }
 
 function pageLeft() {
-  document
-    .querySelector(
-      "#ClientTicketHistoryDiv > table > tbody > tr.smallBtnRow > td > div > table > tbody > tr > td > table > tbody > tr > td:nth-child(3) > a"
-    )
+  let possibleElements = [
+    // hopefully everything
+    document.querySelector("[title='Show Previous']"),
+    // // client ticket history
+    // document.querySelector(
+    //   "#ClientTicketHistoryDiv > table > tbody > tr.smallBtnRow > td > div > table > tbody > tr > td > table > tbody > tr > td:nth-child(3) > a"
+    // ),
+    // // asset ticket history
+    // document.querySelector(
+    //   "#ListFooterDiv > table > tbody > tr > td:nth-child(1) > table > tbody > tr > td:nth-child(3) > a"
+    // ),
+    // // clients assets
+    // document.querySelector(
+    //   "#ClientAssetsListDiv > table > tbody > tr.panelButtonRow > td > div:nth-child(2) > table > tbody > tr > td:nth-child(3) > a"
+    // ),
+    // // asset asset history
+    // document.querySelector(
+    //   "#ListFooterDiv > table > tbody > tr > td:nth-child(1) > table > tbody > tr > td:nth-child(3) > a"
+    // ),
+  ];
 
-    ?.click();
-  document
-    .querySelector(
-      "#ListFooterDiv > table > tbody > tr > td:nth-child(1) > table > tbody > tr > td:nth-child(3) > a"
-    )
-    ?.click();
+  for (let element of possibleElements) {
+    console.log(element);
+    if (element) element.click();
+  }
 }
 
 function pageRight() {
-  document
-    .querySelector(
-      "#ClientTicketHistoryDiv > table > tbody > tr.smallBtnRow > td > div > table > tbody > tr > td > table > tbody > tr > td:nth-child(7) > a"
-    )
-    ?.click();
-  document
-    .querySelector(
-      "#ListFooterDiv > table > tbody > tr > td:nth-child(1) > table > tbody > tr > td:nth-child(7) > a"
-    )
-    .click();
+  let possibleElements = [
+    // hopefully everything
+    document.querySelector("[title='Show Next']"),
+    // // client ticket history
+    // document.querySelector(
+    //   "#ClientTicketHistoryDiv > table > tbody > tr.smallBtnRow > td > div > table > tbody > tr > td > table > tbody > tr > td:nth-child(7) > a"
+    // ),
+    // // asset ticket history
+    // document.querySelector(
+    //   "#ListFooterDiv > table > tbody > tr > td:nth-child(1) > table > tbody > tr > td:nth-child(7) > a"
+    // ),
+    // // clients assets
+    // document.querySelector(
+    //   "#ClientAssetsListDiv > table > tbody > tr.panelButtonRow > td > div:nth-child(2) > table > tbody > tr > td:nth-child(7) > a"
+    // ),
+    // // asset asset history
+    // document.querySelector(
+    //   "#ListFooterDiv > table > tbody > tr > td:nth-child(1) > table > tbody > tr > td:nth-child(7) > a"
+    // ),
+  ];
+
+  for (let element of possibleElements) {
+    console.log(element);
+    if (element) element.click();
+  }
 }
 
 function setTabLocationOld() {
@@ -296,7 +325,6 @@ function setTabLocation() {
         "#CustomFieldsPanelDiv > table > tbody > tr:nth-child(1) > td.dataStandard > table > tbody > tr > td:nth-child(1) > div > nobr:nth-child(1) > input[type=radio]"
       ),
     },
-
   ];
 
   let skip = skips.find(({ bad }) => {
@@ -566,11 +594,13 @@ document.addEventListener("keydown", async function (event) {
   }
   // Left Arrow Key or J goes left one page (Ex: go through a client's tickets on the client page)
   else if (event.key === "ArrowLeft" || event.key === "j") {
+    console.log("pageLeft();");
     pageLeft();
     preventDefault = false;
   }
   // Right Arrow Key or K goes right one page (Ex: go through a client's tickets on the client page)
   else if (event.key === "ArrowRight" || event.key === "k") {
+    console.log("pageRight();");
     pageRight();
     preventDefault = false;
   } else {
