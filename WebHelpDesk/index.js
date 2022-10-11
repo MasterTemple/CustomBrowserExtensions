@@ -333,6 +333,12 @@ function setTabLocation() {
   return true;
 }
 
+function defaultMessage() {
+  let note = document.getElementById("noteText");
+  if (note.value === "!")
+    note.value = "Hello\n\nThank you for contacting Biola's IT Helpdesk.\n\n";
+}
+
 async function fillClientTab() {
   // clear fields
   document.querySelector("input[name='emailField']").value = "";
@@ -511,6 +517,10 @@ document.addEventListener("keydown", async function (event) {
     } else {
       closeOrOpenTechNote();
     }
+  }
+  // ENTER (!)
+  else if (event.key === "Enter") {
+    defaultMessage();
   }
   // CTRL + ENTER saves a tech note and formats it (bolds assets and marks tech note as visible if it is an email)
   else if (event.ctrlKey && event.key === "Enter") {
