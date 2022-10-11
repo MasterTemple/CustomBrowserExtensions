@@ -2,8 +2,8 @@
   Web Help Desk Keyboard Short Cuts
   RegEx to match keybinds: /(?<=\/\/ )(ALT|ENTER|CTRL|Left|Right)[^\n]+/gim
   Log Keypress:
-    document.addEventListener("keydown", e => console.log(e.key))
-  */
+    document.addEventListener("keydown", (e) => console.log(e.key))
+*/
 
 function bool(anything) {
   return !!anything;
@@ -228,90 +228,13 @@ function editTechNote() {
 }
 
 function pageLeft() {
-  let possibleElements = [
-    // hopefully everything
-    document.querySelector("[title='Show Previous']"),
-    // // client ticket history
-    // document.querySelector(
-    //   "#ClientTicketHistoryDiv > table > tbody > tr.smallBtnRow > td > div > table > tbody > tr > td > table > tbody > tr > td:nth-child(3) > a"
-    // ),
-    // // asset ticket history
-    // document.querySelector(
-    //   "#ListFooterDiv > table > tbody > tr > td:nth-child(1) > table > tbody > tr > td:nth-child(3) > a"
-    // ),
-    // // clients assets
-    // document.querySelector(
-    //   "#ClientAssetsListDiv > table > tbody > tr.panelButtonRow > td > div:nth-child(2) > table > tbody > tr > td:nth-child(3) > a"
-    // ),
-    // // asset asset history
-    // document.querySelector(
-    //   "#ListFooterDiv > table > tbody > tr > td:nth-child(1) > table > tbody > tr > td:nth-child(3) > a"
-    // ),
-  ];
-
-  for (let element of possibleElements) {
-    console.log(element);
-    if (element) element.click();
-  }
+  let element = document.querySelector("[title='Show Previous']");
+  if (element) element.click();
 }
 
 function pageRight() {
-  let possibleElements = [
-    // hopefully everything
-    document.querySelector("[title='Show Next']"),
-    // // client ticket history
-    // document.querySelector(
-    //   "#ClientTicketHistoryDiv > table > tbody > tr.smallBtnRow > td > div > table > tbody > tr > td > table > tbody > tr > td:nth-child(7) > a"
-    // ),
-    // // asset ticket history
-    // document.querySelector(
-    //   "#ListFooterDiv > table > tbody > tr > td:nth-child(1) > table > tbody > tr > td:nth-child(7) > a"
-    // ),
-    // // clients assets
-    // document.querySelector(
-    //   "#ClientAssetsListDiv > table > tbody > tr.panelButtonRow > td > div:nth-child(2) > table > tbody > tr > td:nth-child(7) > a"
-    // ),
-    // // asset asset history
-    // document.querySelector(
-    //   "#ListFooterDiv > table > tbody > tr > td:nth-child(1) > table > tbody > tr > td:nth-child(7) > a"
-    // ),
-  ];
-
-  for (let element of possibleElements) {
-    console.log(element);
-    if (element) element.click();
-  }
-}
-
-function setTabLocationOld() {
-  // these will be the elements to select in order; first one that is empty
-  let elements = [];
-  // } else if (event.key === "Tab") {
-
-  // dirty method
-  /*
-        get select element count
-        */
-  let selects = [
-    ...document.getElementById("ticketRequestTypeObserverDiv").childNodes,
-  ].filter((t) => t.tagName === "SELECT");
-  // length > 1 means I have started filling out request detail
-  if (selects.at(-1).value === "WONoSelectionString" && selects.length > 1) {
-    // for (let i = 0; i < 4 + selects.length; i++) {
-    //   document.dispatchEvent(new KeyboardEvent("keydown", { key: "TAB" }));
-    // }
-    selects.at(-1).focus();
-
-    // if (event.shiftKey === false)
-    // document.dispatchEvent(new KeyboardEvent("keydown", { key: "Space" }));
-    // new KeyboardEvent("keydown", { keyCode: 32, which: 32 });
-  }
-  // deprecated
-  // ExpandSelect(
-  //   [...document.getElementById("ticketRequestTypeObserverDiv").childNodes]
-  //     .filter((t) => t.tagName === "SELECT")
-  //     .at(-1)
-  // );
+  let element = document.querySelector("[title='Show Next']");
+  if (element) element.click();
 }
 
 function setTabLocation() {
@@ -792,54 +715,4 @@ document.addEventListener("paste", async (event) => {
   }
 });
 
-/*
-window.addEventListener("load", function () {
-  // scrape client type
-
-  clientType = {
-    affiliationType: [
-      ...document.querySelectorAll("div.ticketSection > table > tbody > tr"),
-    ]
-      .find((f) => f.innerText.includes("Primary Affiliation"))
-      .innerText.match(/(?<=\n)[^\t]+/gim)[0],
-    employeeType: [
-      ...document.querySelectorAll("div.ticketSection > table > tbody > tr"),
-    ]
-      .find((f) => f.innerText.includes("Employee Type"))
-      .innerText.match(/(?<=\n)[^\t]+/gim)[0],
-  };
-
-  // console.log(clientType);
-  // auto focuses request detail when blank
-  let requestDetail = this.document.getElementById("requestDetail");
-  if (requestDetail) {
-    if (requestDetail?.value?.length === 0) {
-      requestDetail.focus();
-      return;
-    }
-  }
-  // currently does nothing
-  // but exists to chain events that require loading in between
-  switch (msg) {
-    case "ticketTab":
-      document.dispatchEvent(
-        new KeyboardEvent("keydown", { key: "t", altKey: true })
-      );
-      break;
-    default:
-    // code block
-  }
-
-  // // auto focuses next request type select menu
-  // let selects = [
-  //   ...document.getElementById("ticketRequestTypeObserverDiv").childNodes,
-  // ].filter((t) => t.tagName === "SELECT");
-  // if (selects.at(-1).value === "WONoSelectionString") {
-  //   selects.at(-1).focus();
-  // }
-
-  // i forgot what this was for
-  // it is maybe for client type
-  msg = "";
-});
-*/
+w;
