@@ -230,11 +230,45 @@ function editTechNote() {
 function pageLeft() {
   let element = document.querySelector("[title='Show Previous']");
   if (element) element.click();
+
+  if (document.activeElement.type == "radio") {
+    let buttons = [
+      ...document.querySelectorAll(`[name='${document.activeElement.name}']`),
+    ];
+
+    let index = buttons.findIndex((f) => f.checked);
+    if (index == -1) {
+      index = 0;
+      buttons[index].checked = true;
+      return;
+    }
+
+    index = index - 1;
+    if (index < 0) index = buttons.length - 1;
+    buttons[index].checked = true;
+  }
 }
 
 function pageRight() {
   let element = document.querySelector("[title='Show Next']");
   if (element) element.click();
+
+  if (document.activeElement.type == "radio") {
+    let buttons = [
+      ...document.querySelectorAll(`[name='${document.activeElement.name}']`),
+    ];
+
+    let index = buttons.findIndex((f) => f.checked) || 0;
+    if (index == -1) {
+      index = 0;
+      buttons[index].checked = true;
+      return;
+    }
+
+    index = index + 1;
+    if (index == buttons.length) index = 0;
+    buttons[index].checked = true;
+  }
 }
 
 function setTabLocation() {
@@ -728,5 +762,3 @@ document.addEventListener("paste", async (event) => {
     event.preventDefault();
   }
 });
-
-w;
