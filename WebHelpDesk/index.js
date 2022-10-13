@@ -611,13 +611,11 @@ document.addEventListener("keydown", async function (event) {
   }
   // Left Arrow Key or J goes left one page (Ex: go through a client's tickets on the client page)
   else if (event.key === "ArrowLeft" || event.key === "j") {
-    console.log("pageLeft();");
     pageLeft();
     preventDefault = false;
   }
   // Right Arrow Key or K goes right one page (Ex: go through a client's tickets on the client page)
   else if (event.key === "ArrowRight" || event.key === "k") {
-    console.log("pageRight();");
     pageRight();
     preventDefault = false;
   } else {
