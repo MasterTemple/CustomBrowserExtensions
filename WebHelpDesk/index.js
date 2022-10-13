@@ -260,7 +260,7 @@ function pageRight() {
 
     let index = buttons.findIndex((f) => f.checked) || 0;
     if (index == -1) {
-      index = 0;
+      index = 1;
       buttons[index].checked = true;
       return;
     }
