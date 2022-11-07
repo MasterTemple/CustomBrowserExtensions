@@ -593,8 +593,9 @@ document.addEventListener("keydown", async function (event) {
   else if (event.shiftKey === false && event.key === "Tab") {
     let keepDefault = false;
     if (isClientTab()) keepDefault = clientTabOrder();
-    if (isAssetTab()) keepDefault = assetTabOrder();
-    if (isTicketTab()) keepDefault = ticketTabOrder();
+    else if (isAssetTab()) keepDefault = assetTabOrder();
+    else if (isTicketTab()) keepDefault = ticketTabOrder();
+    else keepDefault = true;
     if (keepDefault) preventDefault = false;
   }
   // ALT + F fills out client info from copied email
