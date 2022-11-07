@@ -525,6 +525,8 @@ async function selectResults() {
 }
 
 const msg = window.location.href.match(/(?<=msg\=)[^\&]+/gim);
+const leftMotions = ["ArrowLeft", "j", "b", "h"];
+const rightMotions = ["ArrowRight", "w", "e", "k", "l"];
 var clientType = {};
 
 document.addEventListener("keydown", async function (event) {
@@ -610,12 +612,12 @@ document.addEventListener("keydown", async function (event) {
     editTechNote();
   }
   // Left Arrow Key or J goes left one page (Ex: go through a client's tickets on the client page)
-  else if (event.key === "ArrowLeft" || event.key === "j") {
+  else if (leftMotions.includes(event.key)) {
     pageLeft();
     preventDefault = false;
   }
   // Right Arrow Key or K goes right one page (Ex: go through a client's tickets on the client page)
-  else if (event.key === "ArrowRight" || event.key === "k") {
+  else if (rightMotions.includes(event.key)) {
     pageRight();
     preventDefault = false;
   } else {
