@@ -142,14 +142,24 @@ function closeOrOpenTechNote() {
   }
 }
 
-function selectRequestType() {
+function selectRequestTypeOrQuickTicketOrBulkSelection() {
   let selects = [
-    ...document.getElementById("ticketRequestTypeObserverDiv").childNodes,
+    ...(document.getElementById("ticketRequestTypeObserverDiv")?.childNodes ||
+      []),
   ].filter((t) => t.tagName === "SELECT");
-  if (selects.at(-1).value === "WONoSelectionString") {
-    selects.at(-1).focus();
+
+  // selects request type
+  if (selects?.length) {
+    if (selects.at(-1).value === "WONoSelectionString") {
+      // select latest if it is not filled out
+      selects.at(-1).focus();
+    } else {
+      // select first
+      selects[0].focus();
+    }
   } else {
-    selects[0].focus();
+    // focus on quick ticket/bulk action
+    document.querySelector("#bulkActionSelection").focus();
   }
 }
 
@@ -585,9 +595,9 @@ document.addEventListener("keydown", async function (event) {
   else if (event.altKey && event.key === "j") {
     jumpTickets();
   }
-  // ALT + R expands request type select menu
+  // ALT + R expands request type select menu or focuses on quick ticket/bulk action
   else if (event.altKey && event.key === "r") {
-    selectRequestType();
+    selectRequestTypeOrQuickTicketOrBulkSelection();
   }
   // TAB goes to next request subtype
   else if (event.shiftKey === false && event.key === "Tab") {
