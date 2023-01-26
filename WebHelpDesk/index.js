@@ -641,8 +641,14 @@ document.addEventListener("keydown", async function (event) {
 document.addEventListener("paste", async (event) => {
   let element = event.target;
   let text = await navigator.clipboard.readText();
+  // text = text.toString()
+  console.log(text);
   text = text.replace(/\r/gim, "");
   // text = text.replace(/^\n*---------- Forwarded message ---------\n/g, "");
+  // let newMessageThing = "\\n+— Biola's IT Helpdesk Staff\\n\\nWondering how to sort through your Google Drive? Navigate to this link to see what files are taking up the most space in your Drive: https://drive.google.com/drive/quota\\n+"
+  // text = text.replace(new RegExp(newMessageThing, "g"), "")
+
+  text = text.replace(/\n+— Biola's IT Helpdesk Staff\n+Wondering how to sort through your Google Drive\? Navigate to this link to see what files are taking up the most space in your Drive: https:\/\/drive.google.com\/drive\/quota\n+/, "");
 
   // removes ticket thread
   text = text.replace(
