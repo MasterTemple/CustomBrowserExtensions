@@ -649,6 +649,8 @@ document.addEventListener("paste", async (event) => {
   // text = text.replace(new RegExp(newMessageThing, "g"), "")
 
   text = text.replace(/\n+— Biola's IT Helpdesk Staff\n+Wondering how to sort through your Google Drive\? Navigate to this link to see what files are taking up the most space in your Drive: https:\/\/drive.google.com\/drive\/quota\n+/, "");
+  text = text.replace(/\n+— Biola's IT Helpdesk Staff\s+Wondering how to sort through your Google Drive\? Navigate to this link to see what files are taking up the most space in your Drive:\s+https:\/\/drive.google.com\/drive\/quota\s+/g, "");
+  console.log(text);
 
   // removes ticket thread
   text = text.replace(
