@@ -58,7 +58,7 @@ function isAssetTab() {
 }
 
 function isClientTab() {
-  return bool(
+  return Boolean(
     document.querySelector(
       "#ClientPartUpdateContainerDiv > div:nth-child(1) > div > form > div.sectionDividerNoTopMargin > div"
     )
@@ -66,7 +66,7 @@ function isClientTab() {
 }
 
 function isTicketTab() {
-  return bool(
+  return Boolean(
     document.querySelector(
       "#DatesPanelDiv > table > tbody > tr:nth-child(1) > td:nth-child(1)"
     )
@@ -436,6 +436,7 @@ async function fillAssetTab() {
 }
 async function fillTicketTab() {
   let text = (await navigator.clipboard.readText()).replace(/\r/gim, "");
+  // console.log({text});
 
   let firstName = text.match(/(?<=^From: )\S+/gim)?.[0];
   let lastName = text.match(/(?<=^From: \S+ )\S+/gim)?.[0];
@@ -448,10 +449,15 @@ async function fillTicketTab() {
     lastName = text.match(/(?<=^Name:\s+\S+ )\S+/gim)?.[0];
     email = text.match(/(?<=^Email:\s+)\S+/gim)?.[0];
   }
+  // subject line
   document.getElementById("subject").value = text
-    ?.match(/(?<=Subject: ).*/)
+    ?.match(/(?<=Subject: ).*/)[0]
     ?.replace(/ \w/gim, (m) => ` ${m.toUpperCase()}`)
-    ?.replace(/^./gim, (m) => m.toUpperCase());
+    ?.replace(/^./gim, (m) => m.toUpperCase())
+    ?.replace(/\s+/g, " ");
+
+  // request detail
+  pasteAndFormatIntoElement(document.getElementById("requestDetail"), text)
 
   if (isBiolaEmail)
     // sets client info accurate
@@ -533,6 +539,195 @@ async function selectResults() {
     )
     .forEach((e) => e.click());
 }
+
+async function pasteAndFormatIntoElement(element, text) {
+  // text = text.toString()
+  // console.log(text);
+  text = text.replace(/\r/gim, "");
+  // text = text.replace(/^\n*---------- Forwarded message ---------\n/g, "");
+  // let newMessageThing = "\\n+— Biola's IT Helpdesk Staff\\n\\nWondering how to sort through your Google Drive? Navigate to this link to see what files are taking up the most space in your Drive: https://drive.google.com/drive/quota\\n+"
+  // text = text.replace(new RegExp(newMessageThing, "g"), "")
+
+  text = text.replace(/\n+— Biola's IT Helpdesk Staff\n+Wondering how to sort through your Google Drive\? Navigate to this link to see what files are taking up the most space in your Drive: https:\/\/drive.google.com\/drive\/quota\n+/, "");
+  text = text.replace(/\n+— Biola's IT Helpdesk Staff\s+Wondering how to sort through your Google Drive\? Navigate to this link to see what files are taking up the most space in your Drive:\s+https:\/\/drive.google.com\/drive\/quota\s+/g, "");
+  // console.log(text);
+
+  // removes ticket thread
+  text = text.replace(
+    /On .* Biola IT Helpdesk <it.helpdesk@biola.edu> wrote:[^]+/gim,
+    ""
+  );
+
+  let quoteCount =
+    text.match(/---------- Forwarded message ---------/gim)?.length || 0;
+  // FINISH THIS
+  quoteCount += text.match(/On .* at .* \<.*\> wrote:/gim)?.length || 0;
+  text = text.replace(/On .* at .* \<.*\> wrote:/gim, (m) => `[quote]${m}`);
+  // console.log({ text });
+  text = text.replace(
+    /\n*---------- Forwarded message ---------\n+/gim,
+    "[quote]\n"
+  );
+  // console.log({ text });
+  text = text.replace(/(?<=^Subject: .*\[\/?quote)\]/gim, "​]");
+
+  let isEmail = text.match(/^(\[quote\]\n)?From:/g);
+  if (isEmail) {
+    // just made it multiline
+    let isForm = text.match(
+      /^(\[quote\]\n)?(From: OnceHub Mailer \<mailer@oncehub.com\>|From: \<no-reply@biola\.edu\>|From: Alumni Relations <alumni.relations@biola.edu>)/gm
+    );
+    // is formstack form
+    if (isForm) {
+      // console.log({ isForm });
+      let fieldOnNextLine = [
+        "To: <it.helpdesk@biola.edu>\n\n\n ",
+        "Booking page image",
+        "Subject",
+        "Technical Support Appointment",
+        "Calendar",
+        "Your time",
+        "Customer time",
+        "Location",
+        "Booking ID",
+        "Customer name",
+        "Phone number",
+        "Customer's mobile phone",
+        "Type of Assistance",
+        "What type of computer is being updated?",
+        "Best number to reach you",
+        "Asset Number",
+        "Computer OS Update Time Slot",
+        "Ticket Number",
+      ];
+      let fieldOnSameLineWithColon = [
+        "Passcode",
+        "Meeting ID",
+        "Meeting passcode",
+        "Formstack Submission For",
+        "Name",
+        "Asset Number",
+        "What kind of issue are you having\\?",
+        "Describe the problem \\(or error message\\)",
+        "Your Name",
+        "Personal Email Address",
+        "Biola Email Address",
+        "Phone",
+        "Preferred Contact Method",
+        "How can we help with your Biola Alumni Google account\\?",
+        "What difficulty are you having accessing your account\\?",
+        "What method are you using to transfer data out of your account\\?",
+        "Please describe:",
+        "Please describe your difficulty",
+        "Current Legal Name",
+        "Is your current legal name different from your name while attending Biola\\?",
+        "Name while attending Biola",
+        "Current Mailing Address",
+        "Birthday",
+        "Year you graduated or left Biola",
+        "Major at Biola",
+        "Biola ID Number",
+        "Email",
+        "Will this address be used by a department, or by a student group\\?",
+        "Preferred Email Address",
+        "What department will this account belong to\\?",
+        "Who will manage this account\\?",
+        "What is the primary use for this account\\?",
+        "Preferred Email Address",
+        "Preferred Sender Name",
+        "What department will this account belong to\\?",
+        "Who is the faculty or staff advisor for this student group\\?",
+        "What is the primary use for this account\\?",
+        "Do you agree to the terms and conditions\\?",
+        "Formstack Submission For",
+        "Employee's Name",
+        "Biola ID Number \\(if known\\)",
+        "Effective Starting Date",
+        "Banner Fund Number",
+        "Banner Organization Number",
+        "Department Name",
+        "Position Title",
+        'Who is this person replacing\\? If this is a new position, write "NEW".',
+        "Supervisor Name",
+        "Supervisor's Biola ID",
+        "Will this person drive Biola vehicles\\?",
+        "For HR Use Only",
+        "Is this a Regular or Temporary position\\?",
+        "Temporary until what date\\?",
+        "The standard hours worked per week are:",
+        "The number of months worked per year are:",
+        "Is this a salaried or hourly position\\?",
+        "Starting Hourly Pay:",
+        "Submitter's Name",
+        "Submitter's Email Address",
+        "Email Address of Area Vice President \\(needed for authorization\\)",
+        "For Office Use Only",
+        "Form Name",
+        "Submission Time",
+        "Unique ID",
+        "Please check here if you would like Biola to update your personal email address in our database:",
+        "What topic do you have questions or concerns about\\?",
+        "CPU",
+        "RAM",
+        "Hard Drive",
+      ];
+      let fieldOnSameLineWithoutColon = [
+        "Submitted at",
+        "Name",
+        "Semester subscription cost",
+        "Banner Fund",
+        "Banner Org",
+      ];
+      // maybe i can move the ^ left 1, cause i dont think it makes starting on a new line required for same-line fields
+      let fieldMatcher = new RegExp(
+        `(?<=(^(${fieldOnNextLine.join(
+          "|"
+        )})\\n)|((${fieldOnSameLineWithColon.join(
+          "|"
+        )}):(\\t| )+)|((${fieldOnSameLineWithoutColon.join("|")})(\\t| )+)).*`,
+        "gm"
+      );
+      // console.log(fieldMatcher);
+      // bolds next line after the following headers
+      // first group is `text + newline` (for field being on next line)
+      // second group is `text:` (for field being on same line)
+      text = text.replace(
+        fieldMatcher,
+        // /(?<=(^(To: <it.helpdesk@biola.edu>\n\n\n |Booking page image|Subject|Technical Support Appointment|Calendar|Your time|Customer time|Location|Booking ID|Customer name|Phone number|Customer's mobile phone|Type of Assistance|What type of computer is being updated\?|Best number to reach you|Asset Number|Computer OS Update Time Slot|Ticket Number)\n)|((Passcode|Meeting ID|Meeting passcode|Formstack Submission For|Name|Asset Number|What kind of issue are you having\?|Describe the problem \(or error message\)):(\t| )+)).*/gim,
+        bold
+      );
+    }
+    // bold sender
+    text = text.replace(/(?<=^From: )[^\<]+/gim, bold);
+    text = text.replace(/(?<=^To: )[^\<]+/gim, bold);
+    // bold subject line
+    text = text.replace(/(?<=^Subject: ).*/gim, bold);
+    // bold asset
+    element.value = element.value.replace(
+      /(?<=[^\]])a\d{6}/gim,
+      (m) => `[b]${m.toUpperCase()}[/b]`
+    );
+    // bold id# from alumni verification
+    text = text.replace(/(?<=^ID# )\d+/gim, bold);
+
+    // // removes ticket thread
+    // text = text.replace(
+    //   /On .* Biola IT Helpdesk <it.helpdesk@biola.edu> wrote:[^]+/gim,
+    //   ""
+    // );
+
+    // quotes email
+    // text = `[quote]${text}[/quote]`;
+    for (let i = 0; i < quoteCount; i++) {
+      text += "[/quote]";
+    }
+    text = text.replace(/\n\s+\n/gim, "\n\n");
+    text = text.replace(/\s+\[\/quote\]/gim, "[/quote]");
+    element.value = text;
+    event.preventDefault();
+  }
+}
+
 
 const msg = window.location.href.match(/(?<=msg\=)[^\&]+/gim);
 const leftMotions = ["ArrowLeft", "j", "b", "h"];
@@ -642,7 +837,7 @@ document.addEventListener("paste", async (event) => {
   let element = event.target;
   let text = await navigator.clipboard.readText();
   // text = text.toString()
-  console.log(text);
+  // console.log(text);
   text = text.replace(/\r/gim, "");
   // text = text.replace(/^\n*---------- Forwarded message ---------\n/g, "");
   // let newMessageThing = "\\n+— Biola's IT Helpdesk Staff\\n\\nWondering how to sort through your Google Drive? Navigate to this link to see what files are taking up the most space in your Drive: https://drive.google.com/drive/quota\\n+"
@@ -650,7 +845,7 @@ document.addEventListener("paste", async (event) => {
 
   text = text.replace(/\n+— Biola's IT Helpdesk Staff\n+Wondering how to sort through your Google Drive\? Navigate to this link to see what files are taking up the most space in your Drive: https:\/\/drive.google.com\/drive\/quota\n+/, "");
   text = text.replace(/\n+— Biola's IT Helpdesk Staff\s+Wondering how to sort through your Google Drive\? Navigate to this link to see what files are taking up the most space in your Drive:\s+https:\/\/drive.google.com\/drive\/quota\s+/g, "");
-  console.log(text);
+  // console.log(text);
 
   // removes ticket thread
   text = text.replace(
