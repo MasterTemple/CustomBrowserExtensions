@@ -5,6 +5,10 @@
     document.addEventListener("keydown", (e) => console.log(e.key))
 */
 
+async function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 function bool(anything) {
   return !!anything;
 }
@@ -71,6 +75,14 @@ function isTicketTab() {
       "#DatesPanelDiv > table > tbody > tr:nth-child(1) > td:nth-child(1)"
     )
   );
+}
+
+function getRequestDetail() {
+  return document.getElementById("requestDetail").value;
+}
+
+function getSubject() {
+  return document.getElementById("subject").value;
 }
 
 function clientIsAssigned() {
@@ -390,7 +402,11 @@ async function fillClientTab() {
   document.querySelector("input[name='lastNameField']").value = "";
 
   // read clipboard
-  let text = (await navigator.clipboard.readText()).replace(/\r/gim, "");
+  let text = "";
+  try {
+    text = await readClipboard(); //(await navigator.clipboard.readText()).replace(/\r/gim, "");
+  } catch {}
+  // console.log({ text });
 
   let firstName = text.match(/(?<=^From: )\S+/gim)?.[0];
   let lastName = text.match(/(?<=^From: \S+ )\S+/gim)?.[0];
@@ -432,10 +448,10 @@ async function fillClientTab() {
   }
 }
 async function fillAssetTab() {
-  let text = (await navigator.clipboard.readText()).replace(/\r/gim, "");
+  let text = await readClipboard(); //(await navigator.clipboard.readText()).replace(/\r/gim, "");
 }
 async function fillTicketTab() {
-  let text = (await navigator.clipboard.readText()).replace(/\r/gim, "");
+  let text = await readClipboard(); //(await navigator.clipboard.readText()).replace(/\r/gim, "");
   // console.log({text});
 
   let firstName = text.match(/(?<=^From: )\S+/gim)?.[0];
@@ -457,7 +473,7 @@ async function fillTicketTab() {
     ?.replace(/\s+/g, " ");
 
   // request detail
-  pasteAndFormatIntoElement(document.getElementById("requestDetail"), text)
+  pasteAndFormatIntoElement(document.getElementById("requestDetail"), text);
 
   if (isBiolaEmail)
     // sets client info accurate
@@ -548,8 +564,14 @@ async function pasteAndFormatIntoElement(element, text) {
   // let newMessageThing = "\\n+— Biola's IT Helpdesk Staff\\n\\nWondering how to sort through your Google Drive? Navigate to this link to see what files are taking up the most space in your Drive: https://drive.google.com/drive/quota\\n+"
   // text = text.replace(new RegExp(newMessageThing, "g"), "")
 
-  text = text.replace(/\n+— Biola's IT Helpdesk Staff\n+Wondering how to sort through your Google Drive\? Navigate to this link to see what files are taking up the most space in your Drive: https:\/\/drive.google.com\/drive\/quota\n+/, "");
-  text = text.replace(/\n+— Biola's IT Helpdesk Staff\s+Wondering how to sort through your Google Drive\? Navigate to this link to see what files are taking up the most space in your Drive:\s+https:\/\/drive.google.com\/drive\/quota\s+/g, "");
+  text = text.replace(
+    /\n+— Biola's IT Helpdesk Staff\n+Wondering how to sort through your Google Drive\? Navigate to this link to see what files are taking up the most space in your Drive: https:\/\/drive.google.com\/drive\/quota\n+/,
+    ""
+  );
+  text = text.replace(
+    /\n+— Biola's IT Helpdesk Staff\s+Wondering how to sort through your Google Drive\? Navigate to this link to see what files are taking up the most space in your Drive:\s+https:\/\/drive.google.com\/drive\/quota\s+/g,
+    ""
+  );
   // console.log(text);
 
   // removes ticket thread
@@ -728,6 +750,38 @@ async function pasteAndFormatIntoElement(element, text) {
   }
 }
 
+async function saveClipboard() {
+  return new Promise((resolve) => {
+    // Read the text from the clipboard
+    navigator.clipboard
+      .readText()
+      .then((text) => {
+        text = text.replace(/\r/gim, "");
+        // Save the text to chrome.storage
+        chrome.storage.local.set({ cb: text }, function () {
+          // console.log("Clipboard saved");
+          resolve();
+        });
+      })
+      .catch((err) => {
+        console.error("Failed to read clipboard: ", err);
+        resolve();
+      });
+  });
+}
+
+async function readClipboard() {
+  return await read("cb");
+}
+
+async function read(key) {
+  return new Promise((resolve) => {
+    chrome.storage.local.get([key], function (result) {
+      // console.log("Value retrieved:", result[key]);
+      resolve(result[key]);
+    });
+  });
+}
 
 const msg = window.location.href.match(/(?<=msg\=)[^\&]+/gim);
 const leftMotions = ["ArrowLeft", "j", "b", "h"];
@@ -736,6 +790,7 @@ var clientType = {};
 
 document.addEventListener("keydown", async function (event) {
   event.key = event.key.toLowerCase();
+  await saveClipboard();
   let preventDefault = true;
 
   // CTRL + SPACE opens a mini terminal
@@ -753,6 +808,9 @@ document.addEventListener("keydown", async function (event) {
   else if (event.altKey && event.key === "n") {
     if (isDashboardPage()) {
       createNewTicket();
+      // await sleep(2000);
+      // console.log("i run");
+      // fillClientTab();
     } else {
       closeOrOpenTechNote();
     }
@@ -835,7 +893,7 @@ document.addEventListener("keydown", async function (event) {
 // CTRL + V pasted text is formatted
 document.addEventListener("paste", async (event) => {
   let element = event.target;
-  let text = await navigator.clipboard.readText();
+  let text = await readClipboard(); //await navigator.clipboard.readText();
   // text = text.toString()
   // console.log(text);
   text = text.replace(/\r/gim, "");
@@ -843,8 +901,14 @@ document.addEventListener("paste", async (event) => {
   // let newMessageThing = "\\n+— Biola's IT Helpdesk Staff\\n\\nWondering how to sort through your Google Drive? Navigate to this link to see what files are taking up the most space in your Drive: https://drive.google.com/drive/quota\\n+"
   // text = text.replace(new RegExp(newMessageThing, "g"), "")
 
-  text = text.replace(/\n+— Biola's IT Helpdesk Staff\n+Wondering how to sort through your Google Drive\? Navigate to this link to see what files are taking up the most space in your Drive: https:\/\/drive.google.com\/drive\/quota\n+/, "");
-  text = text.replace(/\n+— Biola's IT Helpdesk Staff\s+Wondering how to sort through your Google Drive\? Navigate to this link to see what files are taking up the most space in your Drive:\s+https:\/\/drive.google.com\/drive\/quota\s+/g, "");
+  text = text.replace(
+    /\n+— Biola's IT Helpdesk Staff\n+Wondering how to sort through your Google Drive\? Navigate to this link to see what files are taking up the most space in your Drive: https:\/\/drive.google.com\/drive\/quota\n+/,
+    ""
+  );
+  text = text.replace(
+    /\n+— Biola's IT Helpdesk Staff\s+Wondering how to sort through your Google Drive\? Navigate to this link to see what files are taking up the most space in your Drive:\s+https:\/\/drive.google.com\/drive\/quota\s+/g,
+    ""
+  );
   // console.log(text);
 
   // removes ticket thread
@@ -1024,11 +1088,14 @@ document.addEventListener("paste", async (event) => {
 });
 
 window.addEventListener("load", function () {
-  let requestDetail = this.document.getElementById("requestDetail");
-  if (requestDetail) {
-    if (requestDetail?.value?.length === 0) {
-      requestDetail.focus();
-      return;
+  console.log("[load]");
+  if (isClientTab()) {
+    fillClientTab();
+  } else if (isTicketTab()) {
+    let requestDetail = getRequestDetail();
+    let subject = getSubject();
+    if (requestDetail.length === 0 && subject.length === 0) {
+      fillTicketTab();
     }
   }
 });
