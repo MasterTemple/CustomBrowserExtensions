@@ -438,7 +438,7 @@ async function fillClientTab() {
 
   // click search button
   if (!firstName && !lastName && !email) {
-    alert("No client data found in clipboard!");
+    // alert("No client data found in clipboard!");
   } else {
     document
       .querySelector(
@@ -838,6 +838,7 @@ document.addEventListener("keydown", async function (event) {
   }
   // ALT + S saves ticket
   else if ((event.altKey || event.ctrlKey) && event.key === "s") {
+    event.preventDefault();
     saveTicket();
   }
   // ALT + Q goes to the "My Tickets" page (your ticket queue)
@@ -1099,3 +1100,22 @@ window.addEventListener("load", function () {
     }
   }
 });
+
+async function onPageEdit() {
+  console.log("Paged edited!");
+}
+
+// thanks chatgpt
+const targetNode = document.documentElement;
+const config = { attributes: true, childList: true, subtree: true };
+let timeoutId;
+
+const callback = function(mutationsList, observer) {
+  clearTimeout(timeoutId);
+  timeoutId = setTimeout(() => {
+    onPageEdit();
+  }, 100);
+};
+
+const observer = new MutationObserver(callback);
+observer.observe(targetNode, config);
